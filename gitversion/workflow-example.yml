@@ -1,0 +1,87 @@
+name: Build and Version
+
+on:
+  push:
+    branches: [ main, develop, 'release/**', 'hotfix/**', 'feature/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Required for GitVersion
+
+    # Make sure git-config is set correctly
+    - name: Setup Git
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "github-actions@github.com"
+
+    # Setup .NET SDK
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '6.0.x'
+
+    # Setup GitVersion
+    - name: Setup GitVersion
+      uses: your-username/setup-gitversion@v1
+      with:
+        versionSpec: '5.x'
+
+    # Ensure main branch exists for GitVersion
+    - name: Create local main branch if needed
+      run: |
+        git fetch origin +refs/heads/main:refs/heads/main || true
+        git branch --list main || git branch main origin/main || git branch main || true
+
+    # Execute GitVersion
+    - name: Execute GitVersion
+      id: gitversion
+      uses: your-username/execute-gitversion@v1
+      with:
+        useConfigFile: true
+        configFilePath: GitVersion.yml
+
+    # Display GitVersion outputs
+    - name: Display GitVersion outputs
+      run: |
+        echo "Major: ${{ steps.gitversion.outputs.major }}"
+        echo "Minor: ${{ steps.gitversion.outputs.minor }}"
+        echo "Patch: ${{ steps.gitversion.outputs.patch }}"
+        echo "SemVer: ${{ steps.gitversion.outputs.semVer }}"
+        echo "FullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}"
+        echo "NuGetVersion: ${{ steps.gitversion.outputs.nuGetVersion }}"
+
+    # Your build steps here
+    - name: Build project
+      run: |
+        dotnet build --configuration Release /p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+
+    # Example of artifact versioning
+    - name: Package project
+      run: |
+        dotnet pack --configuration Release /p:Version=${{ steps.gitversion.outputs.fullSemVer }} --output .
+
+    # Example of uploading versioned artifacts
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: packages-${{ steps.gitversion.outputs.fullSemVer }}
+        path: ./**/*.nupkg
+        
+    # Example of creating a release tag when on main branch
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.gitversion.outputs.majorMinorPatch }}
+        release_name: Release v${{ steps.gitversion.outputs.majorMinorPatch }}
+        draft: false
+        prerelease: false 

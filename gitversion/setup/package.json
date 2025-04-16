@@ -1,0 +1,25 @@
+{
+  "name": "setup-gitversion",
+  "version": "1.0.0",
+  "description": "GitHub Action to install GitVersion",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "github",
+    "actions",
+    "gitversion",
+    "versioning",
+    "semver"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/exec": "^1.1.1",
+    "@actions/http-client": "^2.1.0",
+    "@actions/io": "^1.1.2",
+    "@actions/tool-cache": "^2.0.1"
+  }
+} 

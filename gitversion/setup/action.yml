@@ -1,0 +1,18 @@
+name: 'Setup GitVersion'
+description: 'Installs GitVersion tool on the runner'
+author: 'Your Name'
+inputs:
+  versionSpec:
+    description: 'Version of GitVersion to install. Examples: 5.x, 5.11.x, 5.11.0'
+    required: false
+    default: '5.x'
+  includePrerelease:
+    description: 'Include pre-release versions when matching a version'
+    required: false
+    default: 'false'
+runs:
+  using: 'node16'
+  main: 'index.js'
+branding:
+  icon: 'tag'
+  color: 'blue' 

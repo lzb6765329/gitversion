@@ -1,0 +1,91 @@
+name: 'Execute GitVersion'
+description: 'Executes GitVersion and outputs version details'
+author: 'Your Name'
+inputs:
+  targetPath:
+    description: 'Specify target path of the Git repository to analyze'
+    required: false
+    default: '.'
+  useConfigFile:
+    description: 'Whether to use a custom GitVersion configuration file'
+    required: false
+    default: 'false'
+  configFilePath:
+    description: 'Path to the GitVersion configuration file (GitVersion.yml)'
+    required: false
+    default: 'GitVersion.yml'
+  updateAssemblyInfo:
+    description: 'Whether to update assembly info files'
+    required: false
+    default: 'false'
+  additionalArguments:
+    description: 'Additional command line arguments for GitVersion'
+    required: false
+    default: ''
+outputs:
+  major:
+    description: 'The Major version'
+  minor:
+    description: 'The Minor version'
+  patch:
+    description: 'The Patch version'
+  preReleaseTag:
+    description: 'The PreRelease tag'
+  preReleaseTagWithDash:
+    description: 'The PreRelease tag with dash prefix'
+  preReleaseLabel:
+    description: 'The PreRelease label'
+  preReleaseNumber:
+    description: 'The PreRelease number'
+  weightedPreReleaseNumber:
+    description: 'The weighted PreRelease number'
+  buildMetaData:
+    description: 'The build metadata'
+  buildMetaDataPadded:
+    description: 'The build metadata padded'
+  fullBuildMetaData:
+    description: 'The full build metadata'
+  majorMinorPatch:
+    description: 'The Major.Minor.Patch version'
+  semVer:
+    description: 'The full SemVer version'
+  legacySemVer:
+    description: 'The legacy SemVer version'
+  legacySemVerPadded:
+    description: 'The legacy SemVer padded version'
+  assemblySemVer:
+    description: 'The assembly SemVer version'
+  assemblySemFileVer:
+    description: 'The assembly SemVer file version'
+  fullSemVer:
+    description: 'The full SemVer version'
+  informationalVersion:
+    description: 'The informational version'
+  branchName:
+    description: 'The branch name'
+  sha:
+    description: 'The Git SHA'
+  shortSha:
+    description: 'The short Git SHA'
+  nuGetVersion:
+    description: 'The NuGet version'
+  nuGetVersionV2:
+    description: 'The NuGet version v2'
+  nuGetPreReleaseTag:
+    description: 'The NuGet PreRelease tag'
+  nuGetPreReleaseTagV2:
+    description: 'The NuGet PreRelease tag v2'
+  versionSourceSha:
+    description: 'The version source SHA'
+  commitsSinceVersionSource:
+    description: 'The commits since version source'
+  commitsSinceVersionSourcePadded:
+    description: 'The commits since version source padded'
+  commitDate:
+    description: 'The commit date'
+runs:
+  using: 'node16'
+  main: 'index.js'
+branding:
+  icon: 'tag'
+  color: 'blue' 
