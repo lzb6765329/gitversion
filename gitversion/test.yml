@@ -1,0 +1,63 @@
+name: Versioning
+
+on:
+push:
+branches:
+- '*'
+
+jobs:
+versioning:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout code
+uses: actions/checkout@v3
+
+- name: Get current date
+id: date
+run: echo "date=$(date +'%y%m%d')" >> $GITHUB_OUTPUT
+
+- name: Determine branch
+id: branch
+run: |
+if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+echo "is_main=true" >> $GITHUB_OUTPUT
+else
+echo "is_main=false" >> $GITHUB_OUTPUT
+fi
+
+- name: Calculate patch for main branch
+id: patch_main
+if: steps.branch.outputs.is_main == 'true'
+run: |
+current_month=$(date +'%Y-%m')
+first_month="2025-04"
+months_diff=$(( ( $(date -d "$current_month" +%Y%m) - $(date -d "$first_month" +%Y%m) ) ))
+patch=$((1000 + months_diff))
+echo "patch=$patch" >> $GITHUB_OUTPUT
+
+- name: Get daily build count
+id: build_count
+env:
+GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+run: |
+api_url="https://api.github.com/repos/${{ github.repository }}/actions/runs?created=$(date +'%Y-%m-%d')&branch=${{ github.ref_name }}"
+runs=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$api_url" | jq '.total_count')
+build=$((runs + 1))
+echo "build=$build" >> $GITHUB_OUTPUT
+
+- name: Generate version number
+id: version
+run: |
+major=3
+minor=1
+if [ "${{ steps.branch.outputs.is_main }}" == "true" ]; then
+patch="${{ steps.patch_main.outputs.patch }}"
+else
+patch="${{ steps.date.outputs.date }}"
+fi
+build="${{ steps.build_count.outputs.build }}"
+version="$major.$minor.$patch.$build"
+echo "version=$version" >> $GITHUB_OUTPUT
+
+- name: Print version number
+run: echo "Generated version number: ${{ steps.version.outputs.version }}"
